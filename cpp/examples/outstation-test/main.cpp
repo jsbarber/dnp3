@@ -85,7 +85,7 @@ const unsigned num_frozen_counter = num_frozen_counter_vars * 3;
     const int fcntr16_w_flag_time = 1;
     const int fcntr32_wo_flag = 2;
 
-const unsigned num_analog_output_vars = 6;
+const unsigned num_analog_output_vars = 4;
 const unsigned num_analog_output = num_analog_output_vars * 3;
     const int ao32_w_flag = 0;
     const int ao16_w_flag = 1;

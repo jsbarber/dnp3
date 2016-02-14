@@ -104,13 +104,6 @@ int main(int argc, char* argv[])
     // Enable the master. This will start communications.
     pMaster->Enable();
 
-#if 0
-class AnalogOutputInt16 : public AnalogOutput<int16_t>
-class AnalogOutputInt32 : public AnalogOutput<int32_t>
-class AnalogOutputFloat32 : public AnalogOutput<float>
-class AnalogOutputDouble64 : public AnalogOutput<double>
-#endif
-
     int tick = 0;
     while (true) {
         integrityScan.Demand();
