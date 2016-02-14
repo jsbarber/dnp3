@@ -182,59 +182,6 @@ int main(int argc, char* argv[])
         usleep(1000000);
     }
 
-    do
-    {
-        std::cout << "Enter a command" << std::endl;
-        std::cout << "x - exits program" << std::endl;
-        std::cout << "a - performs and ad-hoc range scan" << std::endl;
-        std::cout << "i - integrity demand scan" << std::endl;
-        std::cout << "e - exception demand scan" << std::endl;
-        std::cout << "d - diable unsolcited" << std::endl;
-        std::cout << "r - cold restart" << std::endl;
-        std::cout << "c - send crob" << std::endl;
-
-        char cmd;
-        std::cin >> cmd;
-        switch(cmd)
-        {
-        case('a') :
-            pMaster->ScanRange(GroupVariationID(1, 2), 0, 3);
-            break;
-        case('d') :
-            pMaster->PerformFunction("disable unsol", FunctionCode::DISABLE_UNSOLICITED,
-            { Header::AllObjects(60, 2), Header::AllObjects(60, 3), Header::AllObjects(60, 4) }
-                                    );
-            break;
-        case('r') :
-        {
-            auto print = [](const RestartOperationResult& result)
-            {
-                if(result.summary == TaskCompletion::SUCCESS) {
-                    std::cout << "Success, Time: " << result.restartTime.GetMilliseconds() << std::endl;
-                } else {
-                    std::cout << "Failure: " << TaskCompletionToString(result.summary) << std::endl;
-                }    
-            };
-            pMaster->Restart(RestartType::COLD, print);
-            break;
-        }
-        case('x'):
-            // C++ destructor on DNP3Manager cleans everything up for you
-            return 0;
-        case('i'):
-            integrityScan.Demand();
-            break;
-        case('c'):
-            {
-                break;
-            }
-        default:
-            std::cout << "Unknown action: " << cmd << std::endl;
-            break;
-        }
-    }
-    while(true);
-
     return 0;
 }
 
