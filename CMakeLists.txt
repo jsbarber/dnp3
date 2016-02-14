@@ -206,6 +206,16 @@ if(DEMO)
   target_link_libraries (outstation-demo LINK_PUBLIC asiodnp3 ${PTHREAD})   
   set_target_properties(outstation-demo PROPERTIES FOLDER demos)
 
+  # ----- master test executable -----
+  add_executable(master-test ./cpp/examples/master-test/main.cpp)
+  target_link_libraries (master-test LINK_PUBLIC asiodnp3 ${PTHREAD})
+  set_target_properties(master-test PROPERTIES FOLDER demos)
+
+  # ----- outstation test executable -----
+  add_executable(outstation-test ./cpp/examples/outstation-test/main.cpp)
+  target_link_libraries (outstation-test LINK_PUBLIC asiodnp3 ${PTHREAD})   
+  set_target_properties(outstation-test PROPERTIES FOLDER demos)
+
   if(DNP3_DECODE)
     
     # ----- decoder executable -----
