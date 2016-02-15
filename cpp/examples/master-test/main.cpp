@@ -41,6 +41,7 @@ static char *pgm;
 static void usage(void)
 {
     std::cout << "Usage: " << pgm << " outstation [-a]" << std::endl;
+    exit(1);
 }
 
 int main(int argc, char* argv[])
@@ -50,7 +51,7 @@ int main(int argc, char* argv[])
     if (argc < 2)
         usage();
 
-    const string host{argv[1]};
+    string host{argv[1]};
     const int phase2 = ((argc > 2) && (string{argv[2]} == "-a"));
 
     // Specify what log levels to use. NORMAL is warning and above
@@ -80,7 +81,9 @@ int main(int argc, char* argv[])
     // you can override application layer settings for the master here
     // in this example, we've change the application layer timeout to 2 seconds
     stackConfig.master.responseTimeout = TimeDuration::Seconds(2);
-    stackConfig.master.disableUnsolOnStartup = true;
+    stackConfig.master.startupIntegrityClassMask = 0;
+    stackConfig.master.disableUnsolOnStartup = false;
+    stackConfig.master.unsolClassMask = 0;
 
     // You can override the default link layer settings here
     // in this example we've changed the default link layer addressing
@@ -97,51 +100,51 @@ int main(int argc, char* argv[])
                    stackConfig										// stack configuration
                );
 
-
     // do Class 0 scan once per interval
-    auto integrityScan = pMaster->AddClassScan(ClassField::CLASS_0, TimeDuration::Seconds(1));
+    auto integrityScan = pMaster->AddClassScan(ClassField::CLASS_0, TimeDuration::Seconds(5));
 
     // Enable the master. This will start communications.
     pMaster->Enable();
 
-    int tick = 0;
-    while (true) {
-        integrityScan.Demand();
+    usleep(500000);
+
+    for (int tick = 0; tick < 9; ++tick) {
+        // integrityScan.Demand();
         if (phase2) {
             CommandSet cmds1{
                 WithIndex(ControlRelayOutputBlock(ControlCode::PULSE_ON, 4, 100, 100), 0),
                 WithIndex(ControlRelayOutputBlock(ControlCode::PULSE_ON, 4, 100, 100), 1),
                 WithIndex(ControlRelayOutputBlock(ControlCode::LATCH_ON, 40, 50, 50), 2),
                 };
-            pMaster->SelectAndOperate(std::move(cmds1), PrintingCommandCallback::Get());
+            pMaster->DirectOperate(std::move(cmds1), PrintingCommandCallback::Get());
 
             CommandSet cmds2{
                 WithIndex(AnalogOutputInt16(0x10), 0),
                 WithIndex(AnalogOutputInt16(0x100), 1),
                 WithIndex(AnalogOutputInt16(0xffff), 2),
             };
-            pMaster->SelectAndOperate(std::move(cmds2), PrintingCommandCallback::Get());
+            pMaster->DirectOperate(std::move(cmds2), PrintingCommandCallback::Get());
 
             CommandSet cmds3{
                 WithIndex(AnalogOutputInt32(0x10000), 3),
                 WithIndex(AnalogOutputInt32(0x100000), 4),
                 WithIndex(AnalogOutputInt32(0xffffff), 5),
             };
-            pMaster->SelectAndOperate(std::move(cmds3), PrintingCommandCallback::Get());
+            pMaster->DirectOperate(std::move(cmds3), PrintingCommandCallback::Get());
 
             CommandSet cmds4{
                 WithIndex(AnalogOutputFloat32(-500.0), 6),
                 WithIndex(AnalogOutputFloat32(0.0), 7),
                 WithIndex(AnalogOutputFloat32(50000.0), 8),
             };
-            pMaster->SelectAndOperate(std::move(cmds4), PrintingCommandCallback::Get());
+            pMaster->DirectOperate(std::move(cmds4), PrintingCommandCallback::Get());
 
             CommandSet cmds5{
                 WithIndex(AnalogOutputDouble64(-50000.0), 9),
                 WithIndex(AnalogOutputDouble64(1.0), 10),
                 WithIndex(AnalogOutputDouble64(500000000.0), 11),
             };
-            pMaster->SelectAndOperate(std::move(cmds5), PrintingCommandCallback::Get());
+            pMaster->DirectOperate(std::move(cmds5), PrintingCommandCallback::Get());
         } else if ((tick % 10) == 0) {
             CommandSet cmds1{
                 WithIndex(ControlRelayOutputBlock(ControlCode::PULSE_ON, 4, 100, 100), 0),
@@ -181,6 +184,7 @@ int main(int argc, char* argv[])
         }
         usleep(1000000);
     }
+    pMaster->Shutdown();
 
     return 0;
 }

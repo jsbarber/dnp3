@@ -48,23 +48,23 @@ const int inst2 = 2;
 const int insts = 3;
 
 const unsigned num_binary_vars = 3;
-const unsigned num_binary = num_binary_vars * 3;
+const unsigned num_binary = num_binary_vars * insts;
     const int bin_packed1 = 0;
     const int bin_packed2 = 1;
     const int bin_w_flag = 2;
 
 const unsigned num_double_binary_vars = 2;
-const unsigned num_double_binary = num_double_binary_vars * 3;
+const unsigned num_double_binary = num_double_binary_vars * insts;
     const int dbin_packed1 = 0;
     const int dbin_packed2 = 1;
 
 const unsigned num_binary_output_vars = 2;
-const unsigned num_binary_output = num_binary_output_vars * 3;
+const unsigned num_binary_output = num_binary_output_vars * insts;
     const int bino1 = 0;
     const int bino2 = 1;
 
 const unsigned num_analog_vars = 6;
-const unsigned num_analog = num_analog_vars * 3;
+const unsigned num_analog = num_analog_vars * insts;
     const int b32_w_flag = 0;
     const int b16_w_flag = 1;
     const int b32_wo_flag = 2;
@@ -73,42 +73,77 @@ const unsigned num_analog = num_analog_vars * 3;
     const int dp_w_flag = 5;
 
 const unsigned num_counter_vars = 4;
-const unsigned num_counter = num_counter_vars * 3;
+const unsigned num_counter = num_counter_vars * insts;
     const int cntr32_w_flag = 0;
     const int cntr16_w_flag = 1;
     const int cntr32_wo_flag = 2;
     const int cntr16_wo_flag = 3;
 
-const unsigned num_frozen_counter_vars = 5;
-const unsigned num_frozen_counter = num_frozen_counter_vars * 3;
+const unsigned num_frozen_counter_vars = 3;
+const unsigned num_frozen_counter = num_frozen_counter_vars * insts;
     const int fcntr32_w_flag = 0;
     const int fcntr16_w_flag_time = 1;
     const int fcntr32_wo_flag = 2;
 
 const unsigned num_analog_output_vars = 4;
-const unsigned num_analog_output = num_analog_output_vars * 3;
+const unsigned num_analog_output = num_analog_output_vars * insts;
     const int ao32_w_flag = 0;
     const int ao16_w_flag = 1;
-    const int aoSP_w_flag = 4;
-    const int aoDP_w_flag = 5;
+    const int aoSP_w_flag = 2;
+    const int aoDP_w_flag = 3;
 
-const unsigned num_time_and_interval_vars = 1;
-const unsigned num_time_and_interval = 3;
+const unsigned num_time_and_interval_vars = 0;
+const unsigned num_time_and_interval = num_time_and_interval_vars * insts;
+    const int to_abs = 0;
+    const int to_abs_interval = 1;
+    const int to_abs_last = 2;
+    const int to_indexed_interval = 3;
 
 void ConfigureDatabase(DatabaseConfigView view)
 {
     for (int i = 0; i < insts; ++i) {
         view.binaries[bin_packed1 + (i * num_binary_vars)].variation = StaticBinaryVariation::Group1Var1;
+        view.binaries[bin_packed1 + (i * num_binary_vars)].metadata.variation = EventBinaryVariation::Group2Var1;
         view.binaries[bin_packed2 + (i * num_binary_vars)].variation = StaticBinaryVariation::Group1Var1;
+        view.binaries[bin_packed2 + (i * num_binary_vars)].metadata.variation = EventBinaryVariation::Group2Var2;
         view.binaries[bin_w_flag + (i * num_binary_vars)].variation = StaticBinaryVariation::Group1Var2;
+        view.binaries[bin_w_flag + (i * num_binary_vars)].metadata.variation = EventBinaryVariation::Group2Var3;
+        for (unsigned j = 0; j < num_binary_vars; ++j)
+            view.binaries[j + (i * num_binary_vars)].metadata.clazz = PointClass::Class0;
 
         view.doubleBinaries[dbin_packed1 + (i * num_double_binary_vars)].variation = StaticDoubleBinaryVariation::Group3Var2;
+        view.doubleBinaries[dbin_packed1 + (i * num_double_binary_vars)].metadata.variation = EventDoubleBinaryVariation::Group4Var1;
         view.doubleBinaries[dbin_packed2 + (i * num_double_binary_vars)].variation = StaticDoubleBinaryVariation::Group3Var2;
+        view.doubleBinaries[dbin_packed2 + (i * num_double_binary_vars)].metadata.variation = EventDoubleBinaryVariation::Group4Var3;
+        for (unsigned j = 0; j < num_double_binary_vars; ++j)
+            view.doubleBinaries[j + (i * num_double_binary_vars)].metadata.clazz = PointClass::Class0;
 
-        view.binaryOutputStatii[bino1 + (i * num_binary_vars)].variation = StaticBinaryOutputStatusVariation::Group10Var2;
-        view.binaryOutputStatii[bino1 + (i * num_binary_vars)].metadata.variation = EventBinaryOutputStatusVariation::Group11Var1; // status w/o time
-        view.binaryOutputStatii[bino2 + (i * num_binary_vars)].variation = StaticBinaryOutputStatusVariation::Group10Var2;
-        view.binaryOutputStatii[bino2 + (i * num_binary_vars)].metadata.variation = EventBinaryOutputStatusVariation::Group11Var2; // status w/ time
+        view.counters[cntr32_w_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var1;
+        view.counters[cntr32_w_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var1;
+        view.counters[cntr16_w_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var2;
+        view.counters[cntr16_w_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var2;
+        view.counters[cntr32_wo_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var5;
+        view.counters[cntr32_wo_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var5;
+        view.counters[cntr16_wo_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var6;
+        view.counters[cntr16_wo_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var6;
+        for (unsigned j = 0; j < num_counter_vars; ++j)
+            view.counters[j + (i * num_counter_vars)].metadata.clazz = PointClass::Class0;
+
+        view.frozenCounters[fcntr32_w_flag + (i * num_frozen_counter_vars)].variation = StaticFrozenCounterVariation::Group21Var1;
+        view.frozenCounters[fcntr32_w_flag + (i * num_frozen_counter_vars)].metadata.variation = EventFrozenCounterVariation::Group23Var1;
+        view.frozenCounters[fcntr16_w_flag_time + (i * num_frozen_counter_vars)].variation = StaticFrozenCounterVariation::Group21Var6;
+        view.frozenCounters[fcntr16_w_flag_time + (i * num_frozen_counter_vars)].metadata.variation = EventFrozenCounterVariation::Group23Var6;
+        view.frozenCounters[fcntr32_wo_flag + (i * num_frozen_counter_vars)].variation = StaticFrozenCounterVariation::Group21Var9;
+        view.frozenCounters[fcntr32_wo_flag + (i * num_frozen_counter_vars)].metadata.variation = EventFrozenCounterVariation::Group23Var5;
+        for (unsigned j = 0; j < num_frozen_counter_vars; ++j)
+            view.frozenCounters[j + (i * num_frozen_counter_vars)].metadata.clazz = PointClass::Class0;
+
+        view.binaryOutputStatii[bino1 + (i * num_binary_output_vars)].variation = StaticBinaryOutputStatusVariation::Group10Var2;
+        view.binaryOutputStatii[bino1 + (i * num_binary_output_vars)].metadata.variation = EventBinaryOutputStatusVariation::Group11Var1; // status w/o time
+        view.binaryOutputStatii[bino2 + (i * num_binary_output_vars)].variation = StaticBinaryOutputStatusVariation::Group10Var2;
+        view.binaryOutputStatii[bino2 + (i * num_binary_output_vars)].metadata.variation = EventBinaryOutputStatusVariation::Group11Var2; // status w/ time
+        for (unsigned j = 0; j < num_binary_output_vars; ++j)
+            view.binaryOutputStatii[j + (i * num_binary_output_vars)].metadata.clazz = PointClass::Class0;
 
         view.analogs[b32_w_flag + (i * num_analog_vars)].variation = StaticAnalogVariation::Group30Var1;
         view.analogs[b32_w_flag + (i * num_analog_vars)].metadata.variation = EventAnalogVariation::Group32Var1; // 32 w/o time
@@ -122,22 +157,8 @@ void ConfigureDatabase(DatabaseConfigView view)
         view.analogs[sp_w_flag + (i * num_analog_vars)].metadata.variation = EventAnalogVariation::Group32Var5; // SP w/o time
         view.analogs[dp_w_flag + (i * num_analog_vars)].variation = StaticAnalogVariation::Group30Var6;
         view.analogs[dp_w_flag + (i * num_analog_vars)].metadata.variation = EventAnalogVariation::Group32Var8; // DP w/ time
-
-        view.counters[cntr32_w_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var1;
-        view.counters[cntr32_w_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var1;
-        view.counters[cntr16_w_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var2;
-        view.counters[cntr16_w_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var2;
-        view.counters[cntr32_wo_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var5;
-        view.counters[cntr32_wo_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var5;
-        view.counters[cntr16_wo_flag + (i * num_counter_vars)].variation = StaticCounterVariation::Group20Var6;
-        view.counters[cntr16_wo_flag + (i * num_counter_vars)].metadata.variation = EventCounterVariation::Group22Var6;
-
-        view.frozenCounters[fcntr32_w_flag + (i * num_frozen_counter_vars)].variation = StaticFrozenCounterVariation::Group21Var1;
-        view.frozenCounters[fcntr32_w_flag + (i * num_frozen_counter_vars)].metadata.variation = EventFrozenCounterVariation::Group23Var1;
-        view.frozenCounters[fcntr16_w_flag_time + (i * num_frozen_counter_vars)].variation = StaticFrozenCounterVariation::Group21Var6;
-        view.frozenCounters[fcntr16_w_flag_time + (i * num_frozen_counter_vars)].metadata.variation = EventFrozenCounterVariation::Group23Var6;
-        view.frozenCounters[fcntr32_wo_flag + (i * num_frozen_counter_vars)].variation = StaticFrozenCounterVariation::Group21Var9;
-        view.frozenCounters[fcntr32_wo_flag + (i * num_frozen_counter_vars)].metadata.variation = EventFrozenCounterVariation::Group23Var5;
+        for (unsigned j = 0; j < num_analog_vars; ++j)
+            view.analogs[j + (i * num_analog_vars)].metadata.clazz = PointClass::Class0;
 
         view.analogOutputStatii[ao32_w_flag + (i * num_analog_output_vars)].variation = StaticAnalogOutputStatusVariation::Group40Var1;
         view.analogOutputStatii[ao32_w_flag + (i * num_analog_output_vars)].metadata.variation = EventAnalogOutputStatusVariation::Group42Var1;
@@ -147,6 +168,8 @@ void ConfigureDatabase(DatabaseConfigView view)
         view.analogOutputStatii[ao32_w_flag + (i * num_analog_output_vars)].metadata.variation = EventAnalogOutputStatusVariation::Group42Var5;
         view.analogOutputStatii[aoDP_w_flag + (i * num_analog_output_vars)].variation = StaticAnalogOutputStatusVariation::Group40Var4;
         view.analogOutputStatii[ao32_w_flag + (i * num_analog_output_vars)].metadata.variation = EventAnalogOutputStatusVariation::Group42Var8;
+        for (unsigned j = 0; j < num_analog_output_vars; ++j)
+            view.analogOutputStatii[j + (i * num_analog_output_vars)].metadata.clazz = PointClass::Class0;
     }
 //      example of configuring analog index 0 for Class2 with floating point variations by default
 //	view.analogs[0].variation = StaticAnalogVariation::Group30Var5;
@@ -270,6 +293,16 @@ int main(int argc, char* argv[])
 	const uint32_t FILTERS = levels::NORMAL; // | levels::ALL_COMMS;
 
         int phase = 1;
+        string host("0.0.0.0");
+        if (argc > 1) {
+            if (string(argv[1]) == "-a")
+                phase = 2;
+            else {
+                host = string(argv[1]);
+                if (argc > 2 && string(argv[2]) == "-a")
+                    phase = 2;
+            }
+        }
         if (argc > 1 && string(argv[1]) == "-a")
             phase = 2;
 
@@ -306,6 +339,7 @@ int main(int argc, char* argv[])
 	// in this example, we've enabled the oustation to use unsolicted reporting
 	// if the master enables it
 	stackConfig.outstation.params.allowUnsolicited = true;
+	stackConfig.outstation.params.unsolClassMask = 0;
 
 	// You can override the default link layer settings here
 	// in this example we've changed the default link layer addressing
